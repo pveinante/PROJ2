@@ -1,0 +1,2 @@
+virtualenv .
+ ./Scripts/activate
