@@ -28,9 +28,21 @@
 	"buffers":
 	[
 		{
+			"file": "test.py",
 			"settings":
 			{
-				"buffer_size": 0,
+				"buffer_size": 212,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "import numpy as np"
+			}
+		},
+		{
+			"file": "Nabil/FaceSwapping_Nabil.py",
+			"settings":
+			{
+				"buffer_size": 5932,
+				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		}
@@ -67,10 +79,12 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/acer/Documents/GitHub/PROJ2"
+		"/C/Users/acer/Documents/GitHub/PROJ2",
+		"/C/Users/acer/Documents/GitHub/PROJ2/Images"
 	],
 	"file_history":
 	[
+		"/C/Users/acer/Documents/GitHub/PROJ2/Scripts/cmake.exe",
 		"/C/Users/acer/Dev/cfehome/cfehome",
 		"/C/Users/acer/Desktop/Unity jeux/Tuto/Assets/Ouvrir.cs",
 		"/C/Users/acer/Desktop/TP C++/TP11/main.cc",
@@ -92,7 +106,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 39.0
 	},
 	"find_in_files":
 	{
@@ -106,6 +120,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"xrange"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -123,31 +138,63 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "test.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 212,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								69,
+								69
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"auto_name": "import numpy as np",
+							"syntax": "Packages/Python/Python.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Nabil/FaceSwapping_Nabil.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5932,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5193,
+								5193
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2072.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
