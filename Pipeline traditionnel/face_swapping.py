@@ -4,13 +4,12 @@ import dlib
 import time
 
 # Initialisation
-img = cv2.imread("antonin.jpg")
-img2 = cv2.imread("paul.jpg")
+img = cv2.imread("paul.jpg")
+img2 = cv2.imread("antonin.jpg")
 height, width, channels = img2.shape
 img2_new_face = np.zeros((height, width, channels), np.uint8)
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 mask = np.zeros_like(img_gray)
-img2 = cv2.imread("paul.jpg")
 img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -74,7 +73,7 @@ for face in faces2:
         x = landmarks.part(n).x
         y = landmarks.part(n).y
         landmarks_points2.append((x, y))
-        cv2.circle(img2, (x, y), 3, (0, 0, 255), -1) # dessiner les marqueurs
+        #cv2.circle(img2, (x, y), 3, (0, 0, 255), -1) # dessiner les marqueurs
     points2 = np.array(landmarks_points2, np.int32)
     convexhull2 = cv2.convexHull(points2)
 
@@ -106,9 +105,9 @@ for triangle_index in indexes_triangles:
     tr2_pt1 = landmarks_points2[triangle_index[0]]
     tr2_pt2 = landmarks_points2[triangle_index[1]]
     tr2_pt3 = landmarks_points2[triangle_index[2]]
-    cv2.line(img2, tr2_pt1, tr2_pt2, 255) # Afficher Triangles
-    cv2.line(img2, tr2_pt2, tr2_pt3, 255)
-    cv2.line(img2, tr2_pt1, tr2_pt3, 255)
+    #cv2.line(img2, tr2_pt1, tr2_pt2, 255) # Afficher Triangles
+    #cv2.line(img2, tr2_pt2, tr2_pt3, 255)
+    #cv2.line(img2, tr2_pt1, tr2_pt3, 255)
     triangle2 = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
 
 
