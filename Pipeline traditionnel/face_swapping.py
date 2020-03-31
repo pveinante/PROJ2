@@ -4,15 +4,16 @@ import dlib
 import time
 
 # Initialisation
-img = cv2.imread("paul.jpg")
-img2 = cv2.imread("antonin.jpg")
+img = cv2.imread("Antonin.jpg")
+img2 = cv2.imread("Nabil.jpg")
 height, width, channels = img2.shape
-img2_new_face = np.zeros((height, width, channels), np.uint8)
+img2_new_face = np.ones((height, width, channels), np.uint8)
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 mask = np.zeros_like(img_gray)
 img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+lines = np.zeros_like(img2)
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor("test.dat")
 def extract_index_nparray(nparray):
     index = None
     for num in nparray[0]:
@@ -25,7 +26,7 @@ faces = detector(img_gray)
 for face in faces:
     landmarks = predictor(img_gray, face)
     landmarks_points = []
-    for n in range(0, 68):
+    for n in range(0, 194):
         x = landmarks.part(n).x
         y = landmarks.part(n).y
         landmarks_points.append((x, y))
@@ -49,9 +50,9 @@ for face in faces:
         pt1 = (t[0], t[1])
         pt2 = (t[2], t[3])
         pt3 = (t[4], t[5])
-        #cv2.line(face_image_1, pt1, pt2, (0, 0, 255), 1) # afficher les triangles
-        #cv2.line(face_image_1, pt2, pt3, (0, 0, 255), 1)
-        #cv2.line(face_image_1, pt1, pt3, (0, 0, 255), 1)
+        cv2.line(face_image_1, pt1, pt2, (0, 0, 255), 1) # afficher les triangles
+        cv2.line(face_image_1, pt2, pt3, (0, 0, 255), 1)
+        cv2.line(face_image_1, pt1, pt3, (0, 0, 255), 1)
 
         # Enregistrer les triangles en fonction des index des marqueurs
         index_pt1 = np.where((points == pt1).all(axis=1))
@@ -69,7 +70,7 @@ faces2 = detector(img2_gray)
 for face in faces2:
     landmarks = predictor(img2_gray, face)
     landmarks_points2 = []
-    for n in range(0, 68):
+    for n in range(0, 194):
         x = landmarks.part(n).x
         y = landmarks.part(n).y
         landmarks_points2.append((x, y))
@@ -105,9 +106,12 @@ for triangle_index in indexes_triangles:
     tr2_pt1 = landmarks_points2[triangle_index[0]]
     tr2_pt2 = landmarks_points2[triangle_index[1]]
     tr2_pt3 = landmarks_points2[triangle_index[2]]
-    #cv2.line(img2, tr2_pt1, tr2_pt2, 255) # Afficher Triangles
-    #cv2.line(img2, tr2_pt2, tr2_pt3, 255)
-    #cv2.line(img2, tr2_pt1, tr2_pt3, 255)
+    #cv2.line(img2, tr2_pt1, tr2_pt2, (100,255,100)) # Afficher Triangles
+    #cv2.line(img2, tr2_pt2, tr2_pt3, (100,255,100))
+    #cv2.line(img2, tr2_pt1, tr2_pt3, (100,255,100))
+    cv2.line(lines, tr2_pt1, tr2_pt2, (255,255,255)) # lignes à moyénner car trous noirs
+    cv2.line(lines, tr2_pt2, tr2_pt3, (255,255,255))
+    cv2.line(lines, tr2_pt1, tr2_pt3, (255,255,255))
     triangle2 = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
 
 
@@ -129,35 +133,45 @@ for triangle_index in indexes_triangles:
     warped_triangle = cv2.warpAffine(cropped_triangle, M, (w, h))
     warped_triangle = cv2.bitwise_and(warped_triangle, warped_triangle, mask=cropped_tr2_mask)
 
-    # Reconstructing destination face
+    # Reconstitution / collage des triangles wrappé
     img2_new_face_rect_area = img2_new_face[y: y + h, x: x + w]
     img2_new_face_rect_area_gray = cv2.cvtColor(img2_new_face_rect_area, cv2.COLOR_BGR2GRAY)
     _, mask_triangles_designed = cv2.threshold(img2_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
     warped_triangle = cv2.bitwise_and(warped_triangle, warped_triangle, mask=mask_triangles_designed)
-
     img2_new_face_rect_area = cv2.add(img2_new_face_rect_area, warped_triangle)
     img2_new_face[y: y + h, x: x + w] = img2_new_face_rect_area
+    #cv2.imshow("stestpg",  img2_new_face) # Affichage construction étape par étape
+    #cv2.waitKey(0)
 
+#Correction des trous noirs
+for i in range(height):
+    for j in range (width):
+        if (lines[i,j] == (255,255,255)).all():
+            val = (0,0,0)
+            for m in range(3):
+                for n in range(3):
+                    if (m!=1 or n!=1):
+                        val = tuple(a+b for a,b in zip(val, img2_new_face[i+m-1,j+n-1]))
+            val = tuple(x/8 for x in val)
+            img2_new_face[i,j] = val
+                    
 
-# coller le visag sur 
+# Blending
 img2_face_mask = np.zeros_like(img2_gray)
 img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 255)
 img2_face_mask = cv2.bitwise_not(img2_head_mask)
-
-
 img2_head_noface = cv2.bitwise_and(img2, img2, mask=img2_face_mask)
 result = cv2.add(img2_head_noface, img2_new_face)
-
 (x, y, w, h) = cv2.boundingRect(convexhull2)
 center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
-cv2.imshow("img", img)
+cv2.imshow("img1", img)
 cv2.imshow("img2", img2)
-cv2.imshow("result", result)
 
 seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
 
-cv2.imshow("seamlessclone", seamlessclone)
+cv2.imshow("result", seamlessclone)
+cv2.imwrite("seamlessclone.jpg", seamlessclone)
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()

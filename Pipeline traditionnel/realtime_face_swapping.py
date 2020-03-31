@@ -4,15 +4,17 @@ import dlib
 import time
 
 
+IMAGE = "trump.jpg"
+
+
 def extract_index_nparray(nparray):
     index = None
     for num in nparray[0]:
         index = num
         break
     return index
-
-
-img = cv2.imread("trump.jpg")
+img = cv2.imread(IMAGE)
+img_test = cv2.imread(IMAGE)
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 mask = np.zeros_like(img_gray)
 
@@ -20,6 +22,7 @@ cap = cv2.VideoCapture(0)
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+old_landmarks_points = [(0,0) for i in range(68)]
 indexes_triangles = []
 
 # Face 1
@@ -31,12 +34,11 @@ for face in faces:
         x = landmarks.part(n).x
         y = landmarks.part(n).y
         landmarks_points.append((x, y))
-
-        # cv2.circle(img, (x, y), 3, (0, 0, 255), -1)
+        #cv2.circle(img_test, (x, y), 2, (0, 0, 255), -1) #dessiner marqueurs
 
     points = np.array(landmarks_points, np.int32)
     convexhull = cv2.convexHull(points)
-    # cv2.polylines(img, [convexhull], True, (255, 0, 0), 3)
+    #cv2.polylines(img, [convexhull], True, (255, 0, 0), 3)
     cv2.fillConvexPoly(mask, convexhull, 255)
 
     face_image_1 = cv2.bitwise_and(img, img, mask=mask)
@@ -88,8 +90,9 @@ while True:
         max_y = 0
         
         for n in range(0, 68):
-            x = landmarks.part(n).x
-            y = landmarks.part(n).y
+            old_x, old_y = old_landmarks_points[n] # frame average
+            x = (landmarks.part(n).x+old_x)/2
+            y = (landmarks.part(n).y+old_y)/2
             landmarks_points2.append((x, y))
             #cv2.circle(img2, (x, y), 3, (0, 255, 0), -1) #dessiner marqueurs
             if x < min_x :
@@ -178,10 +181,12 @@ while True:
             center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
             seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
+            
+            old_landmarks_points = landmarks_points2
 
-    cv2.imshow("img2", img2)
-    cv2.imshow("result", img2_new_)
-    cv2.imshow("clone", seamlessclone)
+    cv2.imshow(IMAGE, img_test)
+    cv2.imshow("transformation", img2_new_face)
+    cv2.imshow("face swap", seamlessclone)
 
     key = cv2.waitKey(1)
     if key == 27:
